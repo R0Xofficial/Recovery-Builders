@@ -95,8 +95,8 @@ jobs:
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/PBRP
         cd ${GITHUB_WORKSPACE}/PBRP
-        git config --global user.name "Samuel Kendall"
-        git config --global user.email "kinguser981@gmail.com"
+        git config --global user.name "R0Xofficial"
+        git config --global user.email "patryk.bieganski1003@gmail.com"
         repo init -u https://github.com/PitchBlackRecoveryProject/manifest_pb.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
         repo sync -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
