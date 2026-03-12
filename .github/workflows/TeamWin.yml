@@ -3,55 +3,55 @@ name: TeamWin - Build
 on:
   workflow_dispatch:
     inputs:
-      MANIFEST_BRANCH:
-        description: 'TWRP Branch'
-        required: true
-        default: 'twrp-12.1'
-        type: choice
-        options:
-        - twrp-12.1
-        - twrp-11
-        - twrp-10.0
-        - twrp-9.0
-      DEVICE_TREE:
-        description: 'Custom Recovery Tree'
-        required: true
-        default: 'https://github.com/R0Xofficial/android_device_samsung_r8q'
+    MANIFEST_BRANCH:
+      description: 'TWRP Branch'
+      required: true
+      default: 'twrp-12.1'
+      type: choice
+      options:
+      - twrp-12.1
+      - twrp-11
+      - twrp-10.0
+      - twrp-9.0
+    DEVICE_TREE:
+      description: 'Custom Recovery Tree'
+      required: true
+      default: 'https://github.com/R0Xofficial/android_device_samsung_r8q'
       DEVICE_TREE_BRANCH:
-        description: 'Custom Recovery Tree Branch'
-        required: true
-        default: 'twrp_12.1'
-      DEVICE_PATH:
-        description: 'Specify your device path.'
-        required: true
-        default: 'device/samsung/r8q'
-      DEVICE_NAME:
-        description: 'Specify your Device Codename.'
-        required: true
-        default: 'r8q'
-      BUILD_TARGET:
-        description: 'Specify your Build Target'
-        required: true
-        default: 'recovery'
-        type: choice
-        options:
-        - boot
-        - recovery
-        - vendorboot
-      LDCHECK:
-        description: 'Path of blobs to check'
-        required: true
-        default: 'system/bin/qseecomd'
-      RECOVERY_TAR:
-        description: 'Release recovery.tar For Samsung devices'
-        required: false
-        default: true
-        type: boolean
-      RECOVERY_INSTALLER:
-        description: 'Include recovery installer zip'
-        type: boolean
-        required: true
-        default: false
+      description: 'Custom Recovery Tree Branch'
+      required: true
+      default: 'twrp_12.1'
+    DEVICE_PATH:
+      description: 'Specify your device path.'
+      required: true
+      default: 'device/samsung/r8q'
+    DEVICE_NAME:
+      description: 'Specify your Device Codename.'
+      required: true
+      default: 'r8q'
+    BUILD_TARGET:
+      description: 'Specify your Build Target'
+      required: true
+      default: 'recovery'
+      type: choice
+      options:
+      - boot
+      - recovery
+      - vendorboot
+    LDCHECK:
+      description: 'Path of blobs to check'
+      required: true
+      default: 'system/bin/qseecomd'
+    RECOVERY_TAR:
+      description: 'Release recovery.tar For Samsung devices'
+      required: false
+      default: true
+      type: boolean
+    RECOVERY_INSTALLER:
+      description: 'Include recovery installer zip'
+      type: boolean
+      required: true
+      default: false
 
 jobs:
   build:
@@ -81,7 +81,7 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 24
-  
+
     - name: Build Environment
       run: |
         sudo apt update
@@ -91,14 +91,16 @@ jobs:
         sudo bash setup/android_build_env.sh
         sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/bin/repo
         sudo chmod a+x /usr/bin/repo
-  
+
     - name: Set-up Manifest
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/TWRP
         cd ${GITHUB_WORKSPACE}/TWRP
         git config --global user.name "R0Xofficial"
         git config --global user.email "patryk.bieganski1003@gmail.com"
-        repo init -u https://github.com/minimal-twrp-arm64/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }} --depth=1
+        git config --global url."https://github.com/".insteadOf "git@github.com:"
+        git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+        repo init -u https://github.com/minimal-twrp-arm64/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
         repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
     - name: Clone Device Tree
@@ -115,7 +117,7 @@ jobs:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == 'twrp-11' || github.event.inputs.MANIFEST_BRANCH == 'twrp-12.1' }}
         if_true: lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
-  
+
     - name: Building TWRP
       run: |
         cd ${GITHUB_WORKSPACE}/TWRP
@@ -160,7 +162,7 @@ jobs:
         echo "RECOVERY_TYPE=TWRP-vendor_boot" >> $GITHUB_ENV
         fi
       continue-on-error: true
-  
+
     - name: Include Recovery Installer
       run: |
         if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = true ]; then
@@ -169,7 +171,7 @@ jobs:
           zip -ur recovery-installer.zip ${{ env.RECOVERY_TYPE }}.img
         fi
       continue-on-error: true
-    
+
     - name: Recovery to tar for Samsung devices
       run: |
         if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
@@ -193,7 +195,7 @@ jobs:
           Build: ${{ github.event.inputs.MANIFEST_BRANCH }}
           Device: [Device Tree/Branch](${{ github.event.inputs.DEVICE_TREE }}/tree/${{ github.event.inputs.DEVICE_TREE_BRANCH }})
           Commit: Most recent [commit](${{ github.event.inputs.DEVICE_TREE }}/commit/${{ env.COMMIT_ID }}) during building.
-      
+  
     - name: Release ramdisk-recovery
       if: env.CHECK_IMG_IS_OK == 'true'
       uses: softprops/action-gh-release@v1
@@ -209,7 +211,7 @@ jobs:
           Device: [Device Tree/Branch](${{ env.DEVICE_TREE_URL }}/tree/${{ inputs.DEVICE_TREE_BRANCH }})
           Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
           MD5 (img): ${{ env.MD5_IMG }}
-      
+  
     - name: Run LDCheck
       run: |
         cd ${GITHUB_WORKSPACE}/TWRP
