@@ -112,7 +112,7 @@ jobs:
       id: pbrp_branch
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == 'android-11' || github.event.inputs.MANIFEST_BRANCH == 'android-12.1' }}
-        if_true: lunch pb_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+        if_true: lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
   
     - name: Building PitchBlack
