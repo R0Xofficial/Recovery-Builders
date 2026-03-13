@@ -136,11 +136,11 @@ jobs:
 
     - name: Check if Recovery Exist
       run: |
-        cd ${GITHUB_WORKSPACE}/TWRP
-        if [ -f out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img ]; then
+        cd ${GITHUB_WORKSPACE}/TWRP/out/target/product/${{ github.event.inputs.DEVICE_NAME }}
+        if [ -f ${{ github.event.inputs.BUILD_TARGET }}.img ]; then
             echo "CHECK_IMG_IS_OK=true" >> $GITHUB_ENV
             echo "FILE_PATH=${GITHUB_WORKSPACE}/TWRP/out/target/product/${{ github.event.inputs.DEVICE_NAME }}" >> $GITHUB_ENV
-            echo "MD5_IMG=$(md5sum out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img | cut -d ' ' -f 1)" >> $GITHUB_ENV
+            echo "MD5_IMG=$(md5sum ${{ github.event.inputs.BUILD_TARGET }}.img | cut -d ' ' -f 1)" >> $GITHUB_ENV
             echo "RECOVERY_TYPE=${{ github.event.inputs.BUILD_TARGET }}" >> $GITHUB_ENV
         else
             echo "Recovery out directory is empty."
@@ -159,8 +159,8 @@ jobs:
         
     - name: Recovery to tar for Samsung devices
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
-          cd ${{ env.FILE_PATH }}/
+        if [ "${{ github.event.inputs.RECOVERY_TAR }}" = "true" ]; then
+          cd ${{ env.FILE_PATH }}
           cp ${{ env.RECOVERY_TYPE }}.img recovery.img
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
         fi
