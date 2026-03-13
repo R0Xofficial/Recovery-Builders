@@ -20,7 +20,7 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'twrp_12.1'
+        default: 'twrp'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
@@ -39,7 +39,7 @@ on:
         - recovery
         - vendorboot
       LDCHECK:
-        description: 'Path of blobs to check'
+        description: 'Path of blobs to check' 
         required: true
         default: 'system/bin/qseecomd'
       RECOVERY_TAR:
@@ -81,7 +81,7 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 24
-
+      
     - name: Build Environment
       run: |
         sudo apt update
@@ -89,19 +89,18 @@ jobs:
         git clone https://gitlab.com/OrangeFox/misc/scripts
         cd scripts
         sudo bash setup/android_build_env.sh
-        sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/bin/repo
-        sudo chmod a+x /usr/bin/repo
-
+        sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo
+        sudo chmod a+x /usr/local/bin/repo
+      
     - name: Set-up Manifest
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/TWRP
         cd ${GITHUB_WORKSPACE}/TWRP
         git config --global user.name "R0Xofficial"
         git config --global user.email "patryk.bieganski1003@gmail.com"
-        git config --global credential.helper ""
-        git config --global url."https://github.com/".insteadOf "git@github.com:"
-        git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-        repo init -u https://github.com/minimal-twrp-arm64/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        git config --global --unset credential.helper
+        git config --global url."https://github.com/".insteadOf git://github.com/
+        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
         repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
     - name: Clone Device Tree
@@ -118,7 +117,7 @@ jobs:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == 'twrp-11' || github.event.inputs.MANIFEST_BRANCH == 'twrp-12.1' }}
         if_true: lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
-
+      
     - name: Building TWRP
       run: |
         cd ${GITHUB_WORKSPACE}/TWRP
@@ -144,39 +143,27 @@ jobs:
             echo "CHECK_IMG_IS_OK=true" >> $GITHUB_ENV
             echo "FILE_PATH=${GITHUB_WORKSPACE}/TWRP/out/target/product/${{ github.event.inputs.DEVICE_NAME }}" >> $GITHUB_ENV
             echo "MD5_IMG=$(md5sum out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img | cut -d ' ' -f 1)" >> $GITHUB_ENV
+            echo "RECOVERY_TYPE=${{ github.event.inputs.BUILD_TARGET }}" >> $GITHUB_ENV
         else
             echo "Recovery out directory is empty."
             exit 1
         fi
-
-    - name: Rename the Recovery
-      run: |
-        cd ${{ env.FILE_PATH }}/
-        if [ "${{ github.event.inputs.BUILD_TARGET }}" = "boot" ]; then
-        mv boot.img TWRP-boot.img
-        echo "RECOVERY_TYPE=TWRP-boot" >> $GITHUB_ENV
-        elif [ "${{ github.event.inputs.BUILD_TARGET }}" = "recovery" ]; then
-        mv recovery.img TWRP-recovery.img
-        echo "RECOVERY_TYPE=TWRP-recovery" >> $GITHUB_ENV
-        elif [ "${{ github.event.inputs.BUILD_TARGET }}" = "vendorboot" ]; then
-        mv vendor_boot.img TWRP-vendor_boot.img
-        echo "RECOVERY_TYPE=TWRP-vendor_boot" >> $GITHUB_ENV
-        fi
-      continue-on-error: true
 
     - name: Include Recovery Installer
       run: |
         if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = true ]; then
           cd ${{ env.FILE_PATH }}/
           wget https://github.com/kinguser981/recovery-installer/releases/download/11256427880/recovery-installer.zip
+          # Używamy oryginalnej nazwy obrazu wybranej w target
           zip -ur recovery-installer.zip ${{ env.RECOVERY_TYPE }}.img
         fi
       continue-on-error: true
-
+        
     - name: Recovery to tar for Samsung devices
       run: |
         if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
           cd ${{ env.FILE_PATH }}/
+          # Odin wymaga nazwy recovery.img wewnątrz paczki
           cp ${{ env.RECOVERY_TYPE }}.img recovery.img
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
         fi
@@ -190,13 +177,14 @@ jobs:
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.img
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.tar
           ${{ env.FILE_PATH }}/recovery-installer.zip
+          ${{ env.FILE_PATH }}/*.zip
         name: Unofficial TWRP for ${{ github.event.inputs.DEVICE_NAME }} // ${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
           Build: ${{ github.event.inputs.MANIFEST_BRANCH }}
           Device: [Device Tree/Branch](${{ github.event.inputs.DEVICE_TREE }}/tree/${{ github.event.inputs.DEVICE_TREE_BRANCH }})
           Commit: Most recent [commit](${{ github.event.inputs.DEVICE_TREE }}/commit/${{ env.COMMIT_ID }}) during building.
-  
+          
     - name: Release ramdisk-recovery
       if: env.CHECK_IMG_IS_OK == 'true'
       uses: softprops/action-gh-release@v1
@@ -212,11 +200,9 @@ jobs:
           Device: [Device Tree/Branch](${{ env.DEVICE_TREE_URL }}/tree/${{ inputs.DEVICE_TREE_BRANCH }})
           Commit: Most recent [commit](${{ env.DEVICE_TREE_URL }}/commit/${{ env.COMMIT_ID }}) during building.
           MD5 (img): ${{ env.MD5_IMG }}
-  
+          
     - name: Run LDCheck
       run: |
-        cd ${GITHUB_WORKSPACE}/TWRP
-        mkdir -p tools
         cd tools
         mv -n libneeds ${{ env.FILE_PATH }}/recovery/root/
         mv -n ldcheck ${{ env.FILE_PATH }}/recovery/root/
