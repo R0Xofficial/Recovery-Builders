@@ -135,15 +135,14 @@ jobs:
 
     - name: Check if Recovery Exist
       run: |
-        cd workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}
+        cd ${GITHUB_WORKSPACE}/PBRP/out/target/product/${{ github.event.inputs.DEVICE_NAME }}
         if [ -f ${{ github.event.inputs.BUILD_TARGET }}.img ]; then
             echo "CHECK_IMG_IS_OK=true" >> $GITHUB_ENV
-            echo "FILE_PATH=workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}" >> $GITHUB_ENV
-            echo "RECOVERY_TYPE=${{ github.event.inputs.BUILD_TARGET }}" >> $GITHUB_ENV
+            echo "FILE_PATH=${GITHUB_WORKSPACE}/PBRP/out/target/product/${{ github.event.inputs.DEVICE_NAME }}" >> $GITHUB_ENV
             echo "MD5_IMG=$(md5sum ${{ github.event.inputs.BUILD_TARGET }}.img | cut -d ' ' -f 1)" >> $GITHUB_ENV
-            echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
+            echo "RECOVERY_TYPE=${{ github.event.inputs.BUILD_TARGET }}" >> $GITHUB_ENV
         else
-            echo "Build failed - recovery image not found."
+            echo "Recovery out directory is empty."
             exit 1
         fi
   
@@ -157,11 +156,12 @@ jobs:
       continue-on-error: true
     
     - name: Recovery to tar for Samsung devices
-      if: github.event.inputs.RECOVERY_TAR == 'true'
       run: |
-        cd ${{ env.FILE_PATH }}
-        cp ${{ env.RECOVERY_TYPE }}.img recovery.img
-        tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
+        if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
+          cd ${{ env.FILE_PATH }}/
+          cp ${{ env.RECOVERY_TYPE }}.img recovery.img
+          tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
+        fi
       continue-on-error: true
 
     - name: Upload to Release
