@@ -20,7 +20,7 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'twrp'
+        default: 'twrp_12.1'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
@@ -100,7 +100,7 @@ jobs:
         git config --global user.email "patryk.bieganski1003@gmail.com"
         git config --global --unset credential.helper
         git config --global url."https://github.com/".insteadOf git://github.com/
-        repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b ${{ github.event.inputs.MANIFEST_BRANCH }}
         repo sync -c -j$(nproc --all) --force-sync --no-tags --no-clone-bundle --optimized-fetch --prune
 
     - name: Clone Device Tree
@@ -163,7 +163,6 @@ jobs:
       run: |
         if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
           cd ${{ env.FILE_PATH }}/
-          # Odin wymaga nazwy recovery.img wewnątrz paczki
           cp ${{ env.RECOVERY_TYPE }}.img recovery.img
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
         fi
@@ -177,7 +176,7 @@ jobs:
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.img
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.tar
           ${{ env.FILE_PATH }}/recovery-installer.zip
-          ${{ env.FILE_PATH }}/*.zip
+          ${{ env.FILE_PATH }}/TWRP*.zip
         name: Unofficial TWRP for ${{ github.event.inputs.DEVICE_NAME }} // ${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
