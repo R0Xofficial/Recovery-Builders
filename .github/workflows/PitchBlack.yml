@@ -156,12 +156,12 @@ jobs:
       continue-on-error: true
     
     - name: Recovery to tar for Samsung devices
+      if: github.event.inputs.RECOVERY_TAR == true || github.event.inputs.RECOVERY_TAR == 'true'
       run: |
-        if [ ${{ github.event.inputs.RECOVERY_TAR }} = true ]; then
-          cd ${{ env.FILE_PATH }}/
-          cp ${{ env.RECOVERY_TYPE }}.img recovery.img
-          tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
-        fi
+        cd ${{ env.FILE_PATH }}
+        cp ${{ env.RECOVERY_TYPE }}.img recovery.img
+        tar -cvf ${{ env.RECOVERY_TYPE }}.tar recovery.img
+        ls -lh ${{ env.RECOVERY_TYPE }}.tar
       continue-on-error: true
 
     - name: Upload to Release
