@@ -173,7 +173,7 @@ jobs:
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.img
           ${{ env.FILE_PATH }}/${{ env.RECOVERY_TYPE }}.tar
           ${{ env.FILE_PATH }}/recovery-installer.zip
-          ${{ env.FILE_PATH }}/PBRP*.zip
+          ${{ env.FILE_PATH }}/*.zip
         name: Unofficial PitchBlack for ${{ github.event.inputs.DEVICE_NAME }} // ${{ env.BUILD_DATE }}
         tag_name: ${{ github.run_id }}
         body: |
