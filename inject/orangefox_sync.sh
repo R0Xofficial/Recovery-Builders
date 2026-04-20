@@ -12,7 +12,7 @@
 SCRIPT_VERSION="20260420";
 
 # the base version of the current OrangeFox
-FOX_BASE_VERSION="R12";
+FOX_BASE_VERSION="R12.0";
 
 # Our starting point (Fox base dir)
 BASE_DIR="$PWD";
