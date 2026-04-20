@@ -114,6 +114,7 @@ jobs:
           cd sync
           chmod +x orangefox_sync.sh
           ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        fi
         
     - name: Clone Device Tree
       run: |
