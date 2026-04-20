@@ -41,7 +41,7 @@ do_fox_160_R12() {
 	MIN_MANIFEST="https://github.com/nebrassy/platform_manifest_twrp_aosp.git";
 	BASE_VER=14;
 	FOX_BRANCH="fox_16.0-R12";
-	FOX_DEF_BRANCH="fox_16.0-R12";
+	FOX_DEF_BRANCH="fox_16.0";
 	TWRP_BRANCH="twrp-14";
 	DEVICE_BRANCH="android-14";
 	TW_DEVICE_BRANCH="android-14.1";
@@ -53,7 +53,7 @@ do_fox_141_R12_new() {
 	MIN_MANIFEST="https://github.com/nebrassy/platform_manifest_twrp_aosp.git";
 	BASE_VER=14;
 	FOX_BRANCH="fox_14.1-R12-new";
-	FOX_DEF_BRANCH="fox_14.1-R12-new";
+	FOX_DEF_BRANCH="fox_14.1";
 	TWRP_BRANCH="twrp-14";
 	DEVICE_BRANCH="android-14";
 	TW_DEVICE_BRANCH="android-14.1";
@@ -64,7 +64,7 @@ do_fox_141_R12_new() {
 do_fox_121_R12_new() {
 	BASE_VER=12;
 	FOX_BRANCH="fox_12.1-R12-new";
-	FOX_DEF_BRANCH="fox_12.1-R12-new";
+	FOX_DEF_BRANCH="fox_12.1";
 	TWRP_BRANCH="twrp-12.1";
 	DEVICE_BRANCH="android-12.1";
 	TW_DEVICE_BRANCH="android-12.1";
@@ -75,7 +75,7 @@ do_fox_121_R12_new() {
 do_fox_121_R12() {
 	BASE_VER=12;
 	FOX_BRANCH="fox_12.1-R12";
-	FOX_DEF_BRANCH="fox_12.1-R12";
+	FOX_DEF_BRANCH="fox_12.1";
 	TWRP_BRANCH="twrp-12.1";
 	DEVICE_BRANCH="android-12.1";
 	TW_DEVICE_BRANCH="android-12.1";
