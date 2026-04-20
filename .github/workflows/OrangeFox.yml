@@ -97,17 +97,13 @@ jobs:
     - name: Set-up Manifest
       if: github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1' || github.event.inputs.MANIFEST_BRANCH == '16.0' || github.event.inputs.MANIFEST_BRANCH == '16.0-R12' || github.event.inputs.MANIFEST_BRANCH == '14.1-R12-new' || github.event.inputs.MANIFEST_BRANCH == '12.1-R12-new' || github.event.inputs.MANIFEST_BRANCH == '12.1-R12'
       run: |
-        mkdir -p ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        # mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
-        # cd ${GITHUB_WORKSPACE}/OrangeFox
+        mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
+        cd ${GITHUB_WORKSPACE}/OrangeFox
         git config --global user.name "R0Xofficial"
         git config --global user.email "patryk.bieganski1003@gmail.com"
-        repo init -u https://gitlab.com/OrangeFox/Manifest.git -b ${{ github.event.inputs.MANIFEST_BRANCH }} --depth=1
-        repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
-        # git clone https://gitlab.com/OrangeFox/sync.git
-        # cd sync
-        # ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        git clone https://gitlab.com/OrangeFox/sync.git
+        cd sync
+        ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
 
     - name: Clone Device Tree
       run: |
