@@ -27,7 +27,7 @@ MIN_MANIFEST="https://github.com/minimal-manifest-twrp/platform_manifest_twrp_ao
 
 do_fox_160() {
 	MIN_MANIFEST="https://github.com/nebrassy/platform_manifest_twrp_aosp.git";
-	BASE_VER=14;
+	BASE_VER=16;
 	FOX_BRANCH="fox_16.0";
 	FOX_DEF_BRANCH="fox_16.0";
 	TWRP_BRANCH="twrp-14";
@@ -39,7 +39,7 @@ do_fox_160() {
 
 do_fox_160_R12() {
 	MIN_MANIFEST="https://github.com/nebrassy/platform_manifest_twrp_aosp.git";
-	BASE_VER=14;
+	BASE_VER=16;
 	FOX_BRANCH="fox_16.0-R12";
 	FOX_DEF_BRANCH="fox_16.0";
 	TWRP_BRANCH="twrp-14";
