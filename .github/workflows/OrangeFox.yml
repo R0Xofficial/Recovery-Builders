@@ -95,27 +95,16 @@ jobs:
         sudo bash setup/android_build_env.sh
       
     - name: Set-up Manifest
+      if: github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1' || github.event.inputs.MANIFEST_BRANCH == '16.0' || github.event.inputs.MANIFEST_BRANCH == '16.0-R12' || github.event.inputs.MANIFEST_BRANCH == '14.1-R12-new' || github.event.inputs.MANIFEST_BRANCH == '12.1-R12-new' || github.event.inputs.MANIFEST_BRANCH == '12.1-R12'
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
         cd ${GITHUB_WORKSPACE}/OrangeFox
         git config --global user.name "R0Xofficial"
         git config --global user.email "patryk.bieganski1003@gmail.com"
-        SELECTED_BRANCH="${{ github.event.inputs.MANIFEST_BRANCH }}"
-        if [[ "$SELECTED_BRANCH" == "11.0" || "$SELECTED_BRANCH" == "12.1" || "$SELECTED_BRANCH" == "14.1" ]]; then
-          echo "I am using the official OrangeFox sync script for the version $SELECTED_BRANCH"
-          git clone https://gitlab.com/OrangeFox/sync.git
-          cd sync
-          ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        else
-          echo "New version detected ($SELECTED_BRANCH). Downloading the modified sync script..."
-          git clone https://github.com/R0Xofficial/Recovery-Builders.git custom_sync
-          git clone https://gitlab.com/OrangeFox/sync.git
-          cp -f custom_sync/inject/orangefox_sync.sh sync/orangefox_sync.sh
-          cd sync
-          chmod +x orangefox_sync.sh
-          ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        fi
-        
+        git clone https://gitlab.com/OrangeFox/sync.git
+        cd sync
+        ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+
     - name: Clone Device Tree
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
