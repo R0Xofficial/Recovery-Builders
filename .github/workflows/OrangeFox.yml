@@ -11,6 +11,17 @@ on:
         options:
         - 16.0
         - 14.1
+      RELEASE_NAME:
+        description: 'Branch Release Name'
+        required: true
+        type: choice
+        options:
+          - ap1a
+          - ap2a
+          - trunk_staging
+          - aosp_current
+          - lineage
+          - omni
       DEVICE_TREE:
         description: 'Custom Recovery Tree'
         required: true
@@ -111,7 +122,7 @@ jobs:
       id: fox_branch
       with:
         cond: ${{ github.event.inputs.MANIFEST_BRANCH == '14.1' || github.event.inputs.MANIFEST_BRANCH == '16.0' }}
-        if_true: lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
+        if_true: lunch twrp_${{ github.event.inputs.DEVICE_NAME }}-${{ github.event.inputs.RELEASE_NAME }}-eng && make clean && mka adbd ${{ github.event.inputs.BUILD_TARGET }}image
         if_false: lunch omni_${{ github.event.inputs.DEVICE_NAME }}-eng && make clean && mka ${{ github.event.inputs.BUILD_TARGET }}image
       
     - name: Building OrangeFox
