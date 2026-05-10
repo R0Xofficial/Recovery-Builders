@@ -1,4 +1,4 @@
-name: OrangeFox - Legacy Build
+name: OrangeFox - Build
 
 on:
   workflow_dispatch:
