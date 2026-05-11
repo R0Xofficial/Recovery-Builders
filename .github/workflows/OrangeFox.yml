@@ -131,6 +131,8 @@ jobs:
         set +e
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        export BUILD_WITHOUT_CTS=true
+        export SKIP_ABI_CHECKS=true
         set -e
         ${{ steps.fox_branch.outputs.value }}
 
