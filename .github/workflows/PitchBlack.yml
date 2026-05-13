@@ -19,7 +19,7 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'pbrp_12.1'
+        default: 'new-pbrp_12.1'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
